@@ -697,11 +697,20 @@ code_\label :			// assembler code follows
 	x86_64 assembly language then it is worth reading these.  However if you don't understand assembly
 	you can skip the details.
 */
-
+	/*
+		( x -- )
+		Remove x from the stack
+		[ans-forth 2012]
+	*/
 	defcode "DROP",4,,DROP
 	pop %rax		// drop top of stack
 	NEXT
 
+	/*
+		( x1 x2 -- x2 x1 )
+		Exchange the top two stack items.
+		[ans-forth 2012]
+	*/
 	defcode "SWAP",4,,SWAP
 	pop %rax		// swap top two elements on stack
 	pop %rbx
@@ -709,16 +718,31 @@ code_\label :			// assembler code follows
 	push %rbx
 	NEXT
 
+	/*
+		( x -- x x )
+		Duplicate x.
+		[ans-forth 2012]
+	*/
 	defcode "DUP",3,,DUP
 	mov (%rsp),%rax		// duplicate top of stack
 	push %rax
 	NEXT
 
+	/*
+		( x1 x2 -- x1 x2 x1 )
+		Place a copy of x1 on top of the stack.
+		[ans-forth 2012]
+	*/
 	defcode "OVER",4,,OVER
 	mov 8(%rsp),%rax	// get the second element of stack
 	push %rax		// and push it on top
 	NEXT
 
+	/*
+		( x1 x2 x3 -- x2 x3 x1 )
+		Rotate the top three stack entries.
+		[ans-forth 2012]
+	*/
 	defcode "ROT",3,,ROT
 	pop %rax
 	pop %rbx
@@ -728,6 +752,11 @@ code_\label :			// assembler code follows
 	push %rcx
 	NEXT
 
+	/*
+		( x1 x2 x3 -- x3 x1 x2 )
+		Rotate the top three stack entries.
+		[non standard]
+	*/
 	defcode "-ROT",4,,NROT
 	pop %rax
 	pop %rbx
@@ -737,11 +766,21 @@ code_\label :			// assembler code follows
 	push %rbx
 	NEXT
 
+	/*
+		( x1 x2 -- )
+		Drop cell pair x1 x2 from the stack.
+		[ans-forth 2012]
+	*/
 	defcode "2DROP",5,,TWODROP // drop top two elements of stack
 	pop %rax
 	pop %rax
 	NEXT
 
+	/*
+		( x1 x2 -- x1 x2 x1 x2 )
+		Duplicate cell pair x1 x2.
+		[ans-forth 2012]
+	*/
 	defcode "2DUP",4,,TWODUP // duplicate top two elements of stack
 	mov (%rsp),%rax
 	mov 8(%rsp),%rbx
@@ -749,6 +788,11 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		( x1 x2 x3 x4 -- x3 x4 x1 x2 )
+		Exchange the top two cell pairs.
+		[ans-forth 2012]
+	*/
 	defcode "2SWAP",5,,TWOSWAP // swap top two pairs of elements of stack
 	pop %rax
 	pop %rbx
@@ -760,6 +804,11 @@ code_\label :			// assembler code follows
 	push %rcx
 	NEXT
 
+	/*
+		( x -- 0 | x x )
+		Duplicate x if it is non-zero.
+		[ans-forth 2012]
+	*/
 	defcode "?DUP",4,,QDUP	// duplicate top of stack if non-zero
 	mov (%rsp),%rax
 	test %rax,%rax
@@ -767,10 +816,20 @@ code_\label :			// assembler code follows
 	push %rax
 1:	NEXT
 
+	/*
+		( n1 | u1 -- n2 | u2 )
+		Add one (1) to n1 | u1 giving the sum n2 | u2.
+		[ans-forth 2012] maybe non-standard
+	*/
 	defcode "1+",2,,INCR
 	incq (%rsp)		// increment top of stack
 	NEXT
 
+	/*
+		( n1 | u1 -- n2 | u2 )
+		Subtract one (1) from n1 | u1 giving the difference n2 | u2.
+		[ans-forth 2012] maybe non-standard
+	*/
 	defcode "1-",2,,DECR
 	decq (%rsp)		// decrement top of stack
 	NEXT
@@ -783,24 +842,47 @@ code_\label :			// assembler code follows
 	subq $4,(%rsp)		// subtract 4 from top of stack
 	NEXT
 */
+	/*
+		( x -- x+8 )
+		[non standard]
+	*/
 	defcode "8+",2,,INCR8
 	addq $8,(%rsp)		// add 8 to top of stack
 	NEXT
 
+	/*
+		( x -- x-8 )
+		[non standard]
+	*/
 	defcode "8-",2,,DECR8
 	subq $8,(%rsp)		// subtract 8 from top of stack
 	NEXT
 
+	/*
+		( n1 | u1 n2 | u2 -- n3 | u3 )
+		Add n2 | u2 to n1 | u1, giving the sum n3 | u3.
+		[ans-forth 2012] maybe non standard
+	*/
 	defcode "+",1,,ADD
 	pop %rax		// get top of stack
 	add %rax,(%rsp)		// and add it to next word on stack
 	NEXT
 
+	/*
+		( n1 | u1 n2 | u2 -- n3 | u3 )
+		Subtract n2 | u2 from n1 | u1, giving the difference n3 | u3.
+		[ans-forth 2012] maybe non standard
+	*/
 	defcode "-",1,,SUB
 	pop %rax		// get top of stack
 	sub %rax,(%rsp)		// and subtract it from next word on stack
 	NEXT
 
+	/*
+		( n1 | u1 n2 | u2 -- n3 | u3 )
+		Multiply n1 | u1 by n2 | u2 giving the product n3 | u3.
+		[ans-forth 2012] maybe non standard
+	*/
 	defcode "*",1,,MUL
 	pop %rax
 	pop %rbx
@@ -814,6 +896,14 @@ code_\label :			// assembler code follows
 	leaves both quotient and remainder makes this the obvious choice.
 */
 
+	/*
+		( n1 n2 -- n3 n4 )
+		Divide n1 by n2, giving the single-cell remainder n3 and the single-cell quotient n4.
+		An ambiguous condition exists if n2 is zero. If n1 and n2 differ in sign,
+		the implementation-defined result returned will be the same as that returned by
+		either the phrase >R S>D R> FM/MOD or the phrase >R S>D R> SM/REM.
+		[ans-forth 2012]
+	*/
 	defcode "/MOD",4,,DIVMOD
 	xor %rdx,%rdx
 	pop %rbx
@@ -832,6 +922,11 @@ code_\label :			// assembler code follows
 	1 meaning TRUE and 0 meaning FALSE.
 */
 
+	/*
+		( x1 x2 -- flag )
+		flag is true if and only if x1 is bit-for-bit the same as x2.
+		[ans-forth 2012]
+	*/
 	defcode "=",1,,EQU	// top two words are equal?
 	pop %rax
 	pop %rbx
@@ -841,6 +936,10 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		
+		[ans-forth 2012]
+	*/
 	defcode "<>",2,,NEQU	// top two words are not equal?
 	pop %rax
 	pop %rbx
@@ -850,6 +949,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "<",1,,LT
 	pop %rax
 	pop %rbx
@@ -859,6 +961,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode ">",1,,GT
 	pop %rax
 	pop %rbx
@@ -868,6 +973,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "<=",2,,LE
 	pop %rax
 	pop %rbx
@@ -877,6 +985,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode ">=",2,,GE
 	pop %rax
 	pop %rbx
@@ -886,6 +997,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0=",2,,ZEQU	// top of stack equals 0?
 	pop %rax
 	test %rax,%rax
@@ -894,6 +1008,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0<>",3,,ZNEQU	// top of stack not 0?
 	pop %rax
 	test %rax,%rax
@@ -902,6 +1019,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0<",2,,ZLT	// comparisons with 0
 	pop %rax
 	test %rax,%rax
@@ -910,6 +1030,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0>",2,,ZGT
 	pop %rax
 	test %rax,%rax
@@ -918,6 +1041,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0<=",3,,ZLE
 	pop %rax
 	test %rax,%rax
@@ -926,6 +1052,9 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "0>=",3,,ZGE
 	pop %rax
 	test %rax,%rax
@@ -934,21 +1063,33 @@ code_\label :			// assembler code follows
 	push %rax
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "AND",3,,AND	// bitwise AND
 	pop %rax
 	and %rax,(%rsp)
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "OR",2,,OR	// bitwise OR
 	pop %rax
 	or %rax,(%rsp)
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "XOR",3,,XOR	// bitwise XOR
 	pop %rax
 	xor %rax,(%rsp)
 	NEXT
 
+	/*
+		[ans-forth 2012]
+	*/
 	defcode "INVERT",6,,INVERT // this is the FORTH bitwise "NOT" function (cf. NEGATE and NOT)
 	notq (%rsp)
 	NEXT

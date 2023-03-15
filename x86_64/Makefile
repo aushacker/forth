@@ -1,4 +1,4 @@
-all: jonesforth run
+all : jonesforth run
 
 forth : jonesforth.S
 	gcc -nostdlib -static -g -o jonesforth jonesforth.S
