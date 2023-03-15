@@ -1635,7 +1635,7 @@ _TCFA:
 	(Note to those following the source of FIG-FORTH / ciforth: My >DFA definition is
 	different from theirs, because they have an extra indirection).
 
-	You can see that >DFA is easily defined in FORTH just by adding 4 to the result of >CFA.
+	You can see that >DFA is easily defined in FORTH just by adding 8 to the result of >CFA.
 */
 
 	defword ">DFA",4,,TDFA
