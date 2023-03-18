@@ -423,10 +423,11 @@
 	THEN
 ;
 
-( DEPTH returns the depth of the stack. )
-: DEPTH		( -- n )
+( +n is the number of single-cell values contained in the data stack before +n was placed on the stack. )
+: DEPTH		( -- n+ )
 	S0 @ DSP@ -
 	8-			( adjust because S0 was on the stack when we pushed DSP )
+	8 /         ( 8 byte cells )
 ;
 
 (
